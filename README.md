@@ -1,4 +1,4 @@
-# CameraX-Object-Tracking
+# About
 A small library allowing you to analyze images and track objects on interpolated paths.
 
 See this Medium article for more details: https://medium.com/@cwurthner/object-detection-and-tracking-with-firebase-ml-kit-and-camerax-ml-product-search-part-3-8bd138257101  
