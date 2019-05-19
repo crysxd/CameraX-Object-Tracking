@@ -10,7 +10,7 @@ import timber.log.Timber
  * We use this to map the coordinate system of the preview image we received from the camera API to the ArOverlayView's
  * coordinate system which will have an other size.
  */
-class ImageSizeMapper(private val targetWidth: Int, private val targetHeight: Int) : ArObjectTracker() {
+class PositionTranslator(private val targetWidth: Int, private val targetHeight: Int) : ArObjectTracker() {
 
     override fun processObject(arObject: ArObject?) {
         if (arObject != null) {
