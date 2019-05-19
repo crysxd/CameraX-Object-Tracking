@@ -1,2 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="de.crysxd.cameraXTracker"/>
+          package="de.crysxd.cameraXTracker">
+
+    <uses-permission android:name="android.permission.CAMERA" />
+
+</manifest>
