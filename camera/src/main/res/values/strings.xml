@@ -1,0 +1,4 @@
+<resources>
+    <string name="camera_usage_rationale">This app requires access to your camera to work.</string>
+    <string name="allow_camera_usage">Allow camera usage</string>
+</resources>
