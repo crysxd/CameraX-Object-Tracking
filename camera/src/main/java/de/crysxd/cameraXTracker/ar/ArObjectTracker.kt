@@ -21,7 +21,7 @@ open class ArObjectTracker() {
 
     fun removeTrackingListener(listener: ArObjectTrackingListener) = trackingListeners.remove(listener)
 
-    fun pipe(otherTracker: ArObjectTracker): ArObjectTracker {
+    fun pipe(otherTracker: ArObjectTracker?): ArObjectTracker? {
         pipedTracked = otherTracker
         return otherTracker
     }
