@@ -77,7 +77,6 @@ class CameraFragment : Fragment() {
                     setCallbackHandler(imageAnalyzer!!.getHandler())
                     // In our analysis, we care more about the latest image than analyzing *every* image
                     setImageReaderMode(ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE)
-                    setTargetAspectRatio(Rational(16, 9))
                     setTargetResolution(Size(preview.width / 2, preview.height / 2))
                 }.build()
 
