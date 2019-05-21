@@ -14,9 +14,9 @@ import androidx.lifecycle.MutableLiveData
 import de.crysxd.cameraXTracker.ar.ArOverlayView
 import kotlinx.android.synthetic.main.fragment_camera.*
 import timber.log.Timber
-import java.lang.Exception
 
-class CameraFragment : Fragment() {
+@Suppress("unused")
+open class CameraFragment : Fragment() {
 
     private val mutableArOverlayView = MutableLiveData<ArOverlayView>()
     val arOverlayView: LiveData<ArOverlayView> = mutableArOverlayView
@@ -65,24 +65,12 @@ class CameraFragment : Fragment() {
                 CameraX.unbindAll()
 
                 // Create configuration object for the viewfinder use case
-                val previewConfig = PreviewConfig.Builder().apply {
-                    setTargetAspectRatio(Rational(16, 9))
-                    setTargetResolution(Size(preview.width, preview.height))
-                }.build()
-
-                // Build the viewfinder use case
+                val previewConfig = createPreivewConfigBuilder().build()
                 usesCases.add(AutoFitPreviewBuilder.build(previewConfig, preview))
 
                 // Setup image analysis pipeline that computes average pixel luminance in real time
                 if (imageAnalyzer != null) {
-                    val analyzerConfig = ImageAnalysisConfig.Builder().apply {
-                        // Use a worker thread for image analysis to prevent preview glitches
-                        setCallbackHandler(imageAnalyzer!!.getHandler())
-                        // In our analysis, we care more about the latest image than analyzing *every* image
-                        setImageReaderMode(ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE)
-                        setTargetResolution(Size(preview.width / 2, preview.height / 2))
-                    }.build()
-
+                    val analyzerConfig = createAnalyzerConfigBuilder().build()
                     usesCases.add(ImageAnalysis(analyzerConfig).apply {
                         analyzer = imageAnalyzer
                     })
@@ -102,5 +90,20 @@ class CameraFragment : Fragment() {
                     .create()
             }
         }
+    }
+
+    @Suppress("MemberVisibilityCanBePrivate")
+    protected fun createAnalyzerConfigBuilder() = ImageAnalysisConfig.Builder().apply {
+        // Use a worker thread for image analysis to prevent preview glitches
+        setCallbackHandler(imageAnalyzer!!.getHandler())
+        // In our analysis, we care more about the latest image than analyzing *every* image
+        setImageReaderMode(ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE)
+        setTargetResolution(Size(preview.width / 2, preview.height / 2))
+    }
+
+    @Suppress("MemberVisibilityCanBePrivate")
+    protected fun createPreivewConfigBuilder() = PreviewConfig.Builder().apply {
+        setTargetAspectRatio(Rational(16, 9))
+        setTargetResolution(Size(preview.width, preview.height))
     }
 }
