@@ -1,5 +1,6 @@
 package de.crysxd.cameraXTracker
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Rational
 import android.util.Size
@@ -13,6 +14,7 @@ import androidx.lifecycle.MutableLiveData
 import de.crysxd.cameraXTracker.ar.ArOverlayView
 import kotlinx.android.synthetic.main.fragment_camera.*
 import timber.log.Timber
+import java.lang.Exception
 
 class CameraFragment : Fragment() {
 
@@ -56,39 +58,49 @@ class CameraFragment : Fragment() {
 
     private fun startCamera() {
         preview.post {
-            val usesCases = mutableListOf<UseCase>()
+            try {
+                val usesCases = mutableListOf<UseCase>()
 
-            // Make sure that there are no other use cases bound to CameraX
-            CameraX.unbindAll()
+                // Make sure that there are no other use cases bound to CameraX
+                CameraX.unbindAll()
 
-            // Create configuration object for the viewfinder use case
-            val previewConfig = PreviewConfig.Builder().apply {
-                setTargetAspectRatio(Rational(16, 9))
-                setTargetResolution(Size(preview.width, preview.height))
-            }.build()
-
-            // Build the viewfinder use case
-            usesCases.add(AutoFitPreviewBuilder.build(previewConfig, preview))
-
-            // Setup image analysis pipeline that computes average pixel luminance in real time
-            if (imageAnalyzer != null) {
-                val analyzerConfig = ImageAnalysisConfig.Builder().apply {
-                    // Use a worker thread for image analysis to prevent preview glitches
-                    setCallbackHandler(imageAnalyzer!!.getHandler())
-                    // In our analysis, we care more about the latest image than analyzing *every* image
-                    setImageReaderMode(ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE)
-                    setTargetResolution(Size(preview.width / 2, preview.height / 2))
+                // Create configuration object for the viewfinder use case
+                val previewConfig = PreviewConfig.Builder().apply {
+                    setTargetAspectRatio(Rational(16, 9))
+                    setTargetResolution(Size(preview.width, preview.height))
                 }.build()
 
-                usesCases.add(ImageAnalysis(analyzerConfig).apply {
-                    analyzer = imageAnalyzer
-                })
-            }
+                // Build the viewfinder use case
+                usesCases.add(AutoFitPreviewBuilder.build(previewConfig, preview))
 
-            // Bind use cases to lifecycle
-            CameraX.bindToLifecycle(this, *usesCases.toTypedArray())
-            cameraRunning = true
-            Timber.i("Started camera with useCases=$usesCases")
+                // Setup image analysis pipeline that computes average pixel luminance in real time
+                if (imageAnalyzer != null) {
+                    val analyzerConfig = ImageAnalysisConfig.Builder().apply {
+                        // Use a worker thread for image analysis to prevent preview glitches
+                        setCallbackHandler(imageAnalyzer!!.getHandler())
+                        // In our analysis, we care more about the latest image than analyzing *every* image
+                        setImageReaderMode(ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE)
+                        setTargetResolution(Size(preview.width / 2, preview.height / 2))
+                    }.build()
+
+                    usesCases.add(ImageAnalysis(analyzerConfig).apply {
+                        analyzer = imageAnalyzer
+                    })
+                }
+
+                // Bind use cases to lifecycle
+                CameraX.bindToLifecycle(this, *usesCases.toTypedArray())
+                cameraRunning = true
+                Timber.i("Started camera with useCases=$usesCases")
+            } catch (e: Exception) {
+                Timber.e(e)
+                AlertDialog.Builder(context)
+                    .setMessage("The camera is not responding. Please try again later.")
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                        activity?.finish()
+                    }
+                    .create()
+            }
         }
     }
 }
