@@ -65,12 +65,12 @@ open class CameraFragment : Fragment() {
                 CameraX.unbindAll()
 
                 // Create configuration object for the viewfinder use case
-                val previewConfig = createPreivewConfigBuilder().build()
+                val previewConfig = onCreatePreivewConfigBuilder().build()
                 usesCases.add(AutoFitPreviewBuilder.build(previewConfig, preview))
 
                 // Setup image analysis pipeline that computes average pixel luminance in real time
                 if (imageAnalyzer != null) {
-                    val analyzerConfig = createAnalyzerConfigBuilder().build()
+                    val analyzerConfig = onCreateAnalyzerConfigBuilder().build()
                     usesCases.add(ImageAnalysis(analyzerConfig).apply {
                         analyzer = imageAnalyzer
                     })
@@ -93,7 +93,7 @@ open class CameraFragment : Fragment() {
     }
 
     @Suppress("MemberVisibilityCanBePrivate")
-    protected fun createAnalyzerConfigBuilder() = ImageAnalysisConfig.Builder().apply {
+    protected open fun onCreateAnalyzerConfigBuilder() = ImageAnalysisConfig.Builder().apply {
         // Use a worker thread for image analysis to prevent preview glitches
         setCallbackHandler(imageAnalyzer!!.getHandler())
         // In our analysis, we care more about the latest image than analyzing *every* image
@@ -102,7 +102,7 @@ open class CameraFragment : Fragment() {
     }
 
     @Suppress("MemberVisibilityCanBePrivate")
-    protected fun createPreivewConfigBuilder() = PreviewConfig.Builder().apply {
+    protected open fun onCreatePreivewConfigBuilder() = PreviewConfig.Builder().apply {
         setTargetAspectRatio(Rational(16, 9))
         setTargetResolution(Size(preview.width, preview.height))
     }
