@@ -95,7 +95,7 @@ class CameraFragment : Fragment() {
             } catch (e: Exception) {
                 Timber.e(e)
                 AlertDialog.Builder(context)
-                    .setMessage("The camera is not responding. Please try again later.")
+                    .setMessage(getString(R.string.camera_error))
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         activity?.finish()
                     }
