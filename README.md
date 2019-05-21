@@ -59,7 +59,7 @@ And implement `ThreadedImageAnalyzer` like this:
     class MyImageAnalyzer : ViewModel(), ThreadedImageAnalyzer {
 
         val arObjectTracker = ArObjectTracker()
-        private val uiHandler = Handler(Looper.mainLooper())
+        private val uiHandler = Handler(Looper.getMainLooper())
         private val handlerThread = HandlerThread("MyImageAnalyzer").apply { start() }
 
         override fun getHandler() = Handler(handlerThread.looper)
