@@ -1,5 +1,6 @@
 package de.crysxd.cameraXTracker.ar
 
+import android.graphics.Matrix
 import android.graphics.RectF
 import android.util.Size
 import timber.log.Timber
@@ -10,14 +11,18 @@ import timber.log.Timber
  * We use this to map the coordinate system of the preview image we received from the camera API to the ArOverlayView's
  * coordinate system which will have an other size.
  */
-class PositionTranslator(private val targetWidth: Int, private val targetHeight: Int) : ArObjectTracker() {
+class PositionTranslator(
+    private val targetWidth: Int,
+    private val targetHeight: Int,
+    private val frontFacing: Boolean = false
+) : ArObjectTracker() {
 
     override fun processObject(arObject: ArObject?) {
         if (arObject != null) {
             Timber.i("boundingBoxStart = ${arObject.boundingBox}")
 
             // Rotate Size
-            val rotatedSize = when(arObject.sourceRotationDegrees) {
+            val rotatedSize = when (arObject.sourceRotationDegrees) {
                 90, 270 -> Size(arObject.sourceSize.height, arObject.sourceSize.width)
                 0, 180 -> arObject.sourceSize
                 else -> throw IllegalArgumentException("Unsupported rotation. Must be 0, 90, 180 or 270")
@@ -39,16 +44,22 @@ class PositionTranslator(private val targetWidth: Int, private val targetHeight:
             val offsetY = (targetHeight - scaledSize.height) / 2
             Timber.d("Use offsetX=$offsetX, offsetY=$offsetY")
 
-
             // Map bounding box
             val mappedBoundingBox = RectF().apply {
-                left = arObject.boundingBox.left * scaleF + offsetX
+                left = arObject.boundingBox.right * scaleF + offsetX
                 top = arObject.boundingBox.top * scaleF + offsetY
-                right = arObject.boundingBox.right * scaleF + offsetX
+                right = arObject.boundingBox.left * scaleF + offsetX
                 bottom = arObject.boundingBox.bottom * scaleF + offsetY
             }
-            Timber.d("Mapped bounding box=$mappedBoundingBox")
 
+            // The front facing image is flipped, so we need to mirrow the positions on the vertical axis (centerX)
+            if (frontFacing) {
+                val centerX = targetWidth / 2
+                mappedBoundingBox.left = centerX + (centerX - mappedBoundingBox.left)
+                mappedBoundingBox.right = centerX - (mappedBoundingBox.right - centerX)
+            }
+
+            Timber.d("Mapped bounding box=$mappedBoundingBox")
 
             super.processObject(
                 arObject.copy(
