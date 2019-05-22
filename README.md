@@ -85,3 +85,21 @@ And implement `ThreadedImageAnalyzer` like this:
             }
          }   
       }
+
+# Use front facing camera
+
+Use `FrontFacingCameraFragment` instead:
+
+    <fragment
+            android:id="@+id/cameraFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:name="de.crysxd.cameraXTracker.CameraFragment"/>
+            
+Tell PositionTranslator that we use the front facing camera:
+
+    .pipe(PositionTranslator(view.width, view.height))
+    
+# Custom image sizes and option
+
+You can subclass `CameraFragment` and override `onCreateAnalyzerConfigBuilder` and/or `onCreatePreivewConfigBuilder`
